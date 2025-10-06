@@ -16,12 +16,18 @@ This project is pretty simple in nature. It ingests the public iframe provided b
 | Badges          | `Integer` | 10
 | CompletedRooms  | `Integer` | 100
 | Level           | `String`  | [0x5]
+| ProfileImage    | `String`  | https://tryhackme-images.s3.amazonaws.com/user-avatars/*
 
 ## Usage
 
 Output user data to a file:
 ```bash
 python3 thm-iframe-parser.py --user 5672619 --output thm_user.json
+```
+
+You can save the profile picture locally as well:
+```bash
+python3 thm-iframe-parser.py --user 5672619 --output thm_user.json --save thm_user.jpg
 ```
 
 Parse JSON directly in the terminal (this shows the value for "Badges"):
@@ -41,7 +47,8 @@ python3 thm-iframe-parser.py --user 5672619 | jq -r ".Data.Streak"
     "Streak": "9 days",
     "Badges": 7,
     "Completed Rooms": 17,
-    "Level": "[0x5]"
+    "Level": "[0x5]",
+    "ProfileImage": "https://tryhackme-images.s3.amazonaws.com/user-avatars/*"
   }
 }
 ```
@@ -50,4 +57,4 @@ python3 thm-iframe-parser.py --user 5672619 | jq -r ".Data.Streak"
 > Check out the GitHub Workflow I created [here](https://github.com/umikoio/umikoio/blob/main/.github/workflows/update-readme.yml) that automtically collects TryHackMe public data (this script) and periodically updates a GitHub README.
 
 > [!IMPORTANT]
-> At any time TryHackMe can change the HTML data within their iframe. This could potentially break the script. If you notice any problems, feel free to open an [issue](https://github.com/umikoio/thm-iframe-parser/issues)!
+> At any time TryHackMe can change the HTML data within their iframe. This could potentially break the script. If you notice any problems, feel free to open an [issue](https://github.com/umikoio/thm-iframe-parser/issues).
