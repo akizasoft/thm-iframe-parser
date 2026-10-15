@@ -16,7 +16,6 @@ This project is pretty simple in nature. It ingests the public iframe provided b
 | Badges          | `Integer` | 10
 | CompletedRooms  | `Integer` | 100
 | Level           | `String`  | [0x5]
-| ProfileImage    | `String`  | https://tryhackme-images.s3.amazonaws.com/user-avatars/*
 
 ## Usage
 
@@ -47,8 +46,7 @@ python3 thm-iframe-parser.py --user 5672619 | jq -r ".Data.Streak"
     "Streak": "9 days",
     "Badges": 7,
     "Completed Rooms": 17,
-    "Level": "[0x5]",
-    "ProfileImage": "https://tryhackme-images.s3.amazonaws.com/user-avatars/*"
+    "Level": "[0x5]"
   }
 }
 ```
