@@ -1,6 +1,6 @@
 """
-    Author: Umiko (https://github.com/umikoio)
-    Project: THM iframe Parser (https://github.com/umikoio/thm-iframe-parser)
+    Author: Misa (https://github.com/akizasoft)
+    Project: THM iframe Parser (https://github.com/akizasoft/thm-iframe-parser)
 
     TryHackMe iframe Parser ingests the public iframe provided by TryHackMe, parsing the incoming data, and converting it to JSON.
 
@@ -12,6 +12,7 @@
 
 import argparse, json, re, sys, requests, base64, os
 from typing import Any, Dict, List, Union
+from curl_cffi import requests as browser_requests
 from bs4 import BeautifulSoup
 
 THM_IFRAME_URL = "https://tryhackme.com/api/v2/badges/public-profile?userPublicId={user_id}"
@@ -19,7 +20,7 @@ DEFAULT_TIMEOUT = 10
 
 # Persistent info we use to get the correct data
 HTML_ELEMENTS = ["span.details-text", "span.rank-title"]
-THM_TITLES = ["Rank", "Streak", "Badges", "CompletedRooms", "Level", "ProfileImage"]
+THM_TITLES = ["Rank", "Streak", "Badges", "CompletedRooms", "Level"]
 
 def normalize_ws(data: str) -> str:
     """
@@ -35,7 +36,8 @@ def fetch_html(user_id: Union[str, int]) -> str:
     headers = {"Accept": "text/html"}
 
     try:
-        r = requests.get(url, headers=headers, timeout=DEFAULT_TIMEOUT)
+        r = browser_requests.get(url, headers=headers, timeout=DEFAULT_TIMEOUT, impersonate="chrome")
+        r.raise_for_status()
     except Exception as e:
         print(f"There was a problem collecting user information: {e}")
         sys.exit(1)
@@ -48,21 +50,14 @@ def extract_data(html: str) -> List[str]:
     """
     soup = BeautifulSoup(html, "html.parser")
     span_list: List[str] = []
-    already_seen = set()
-    pfp_re = r"https://tryhackme-images\.s3\.amazonaws\.com/user-avatars/[^)\s\"'<>]+"
 
     for element in HTML_ELEMENTS:
         for raw_data in soup.select(element):
             clean_data = normalize_ws(raw_data.get_text(" ", strip=True))
 
-            if clean_data and clean_data not in already_seen:
-                already_seen.add(clean_data)
+            # Keep duplicate values to preserve field order
+            if clean_data:
                 span_list.append(clean_data)
-
-    profile_img = re.search(pfp_re, str(html))
-
-    if profile_img:
-        span_list.append(str(profile_img.group()))
 
     return span_list
 
@@ -89,7 +84,6 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Extract TryHackMe data via the public iframe")
     parser.add_argument("--user", "-u", dest="user", help="Provide the userPublicId flag")
     parser.add_argument("--export", "-e", dest="export", help="Export the data to JSON")
-    parser.add_argument("--save", "-s", dest="save", help="Save TryHackMe profile picture as an image")
     args = parser.parse_args(argv)
 
     user_id = args.user or input("Enter TryHackMe User ID: ").strip()
@@ -113,16 +107,6 @@ def main(argv=None):
         "SourceURL": THM_IFRAME_URL.format(user_id=user_id),
         "Data": final_data,
     }
-
-    if args.save:
-        try:
-            with open(args.save, "wb") as f:
-                f.write(requests.get(json_output['Data']['ProfileImage'], timeout=10).content)
-
-                if os.path.exists(str(args.save)):
-                    print(f"Saved image to {args.save}")
-        except Exception as e:
-            print(f"Failed to save image to {args.save}: {e}", file=sys.stderr)
 
     json_formatted = json.dumps(json_output, indent=2, ensure_ascii=False)
 

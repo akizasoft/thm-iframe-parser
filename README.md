@@ -54,7 +54,7 @@ python3 thm-iframe-parser.py --user 5672619 | jq -r ".Data.Streak"
 ```
 
 > [!NOTE]
-> Check out the GitHub Workflow I created [here](https://github.com/umikoio/umikoio/blob/main/.github/workflows/update-readme.yml) that automtically collects TryHackMe public data (this script) and periodically updates a GitHub README.
+> Check out the GitHub Workflow I created [here](https://github.com/akizasoft/akizasoft/blob/main/.github/workflows/update-readme.yml) that automtically collects TryHackMe public data (this script) and periodically updates a GitHub README.
 
 > [!IMPORTANT]
-> At any time TryHackMe can change the HTML data within their iframe. This could potentially break the script. If you notice any problems, feel free to open an [issue](https://github.com/umikoio/thm-iframe-parser/issues).
+> At any time TryHackMe can change the HTML data within their iframe. This could potentially break the script. If you notice any problems, feel free to open an [issue](https://github.com/akizasoft/thm-iframe-parser/issues).
